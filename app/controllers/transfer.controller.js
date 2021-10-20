@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
-const User = require("../models/user.model.js");
+const Transfer = require("../models/transfer.model.js");
 
-// Create and Save a new User
+// Create and Save a new Transfer
 exports.create = (req, res, next) => {
   // Validate request
   if (!req.body) {
@@ -11,15 +11,18 @@ exports.create = (req, res, next) => {
     });
   }
 
-  // Create a User
-  const user = new User({
+  // Create a Transfer
+  const transfer = new Transfer({
     id: req.body.id || uuidv4(),
-    username: req.body.username,
-    password: req.body.password
+    transfer_acc_id: req.body.transfer_acc_id,
+    receive_acc_id: req.body.receive_acc_id,
+    transfer_amount: req.body.transfer_amount,
+    transfer_type: req.body.transfer_type,
+    remark: req.body.remark
   });
 
-  // Save User in the database
-  User.create(user, (err, data) => {
+  // Save Transfer in the database
+  Transfer.create(transfer, (err, data) => {
     if (err)
       res.status(500).send({
         status: 500,
@@ -31,7 +34,7 @@ exports.create = (req, res, next) => {
 
 // Retrieve all Customers from the database.
 exports.findAll = (req, res) => {
-  User.getAll((err, data) => {
+  Transfer.getAll((err, data) => {
     if (err)
       res.status(500).send({
         status: 500,
@@ -41,41 +44,19 @@ exports.findAll = (req, res) => {
   });
 };
 
-// Find a single User with a userId
-exports.LogIn = (req, res) => {
-  const { username, password } = req.body;
-
-  User.logIn(username, password, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        res.status(404).send({
-          status: 404,
-          data: `Not found with  ${username}.`
-        });
-      } else {
-        res.status(500).send({
-          status: 500,
-          data: "Error retrieving with " + username
-        });
-      }
-    }
-    else res.send(data);
-  });
-};
-
-// Find a single User with a userId
+// Find a single Transfer with a transferId
 exports.findOne = (req, res) => {
-  User.findById(req.params.userId, (err, data) => {
+  Transfer.findById(req.params.transferId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         res.status(404).send({
           status: 404,
-          data: `Not found with id ${req.params.userId}.`
+          data: `Not found with id ${req.params.transferId}.`
         });
       } else {
         res.status(500).send({
           status: 500,
-          data: "Error retrieving with id " + req.params.userId
+          data: "Error retrieving with id " + req.params.transferId
         });
       }
     } else res.send(data);
@@ -83,7 +64,7 @@ exports.findOne = (req, res) => {
 };
 
 
-// Update a User identified by the userId in the request
+// Update a Transfer identified by the transferId in the request
 exports.update = (req, res) => {
   // Validate Request
   if (!req.body) {
@@ -93,20 +74,20 @@ exports.update = (req, res) => {
     });
   }
 
-  User.updateById(
-    req.params.userId,
-    new User(req.body),
+  Transfer.updateById(
+    req.params.transferId,
+    new Transfer(req.body),
     (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
           res.status(404).send({
             status: 404,
-            data: `Not found with id ${req.params.userId}.`
+            data: `Not found with id ${req.params.transferId}.`
           });
         } else {
           res.status(500).send({
             status: 500,
-            data: "Error updating with id " + req.params.userId
+            data: "Error updating with id " + req.params.transferId
           });
         }
       } else res.send(data);
@@ -114,19 +95,19 @@ exports.update = (req, res) => {
   );
 };
 
-// Delete a User with the specified userId in the request
+// Delete a Transfer with the specified transferId in the request
 exports.delete = (req, res) => {
-  User.remove(req.params.userId, (err, data) => {
+  Transfer.remove(req.params.transferId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         res.status(404).send({
           status: 404,
-          data: `Not found  with id ${req.params.userId}.`
+          data: `Not found  with id ${req.params.transferId}.`
         });
       } else {
         res.status(500).send({
           status: 500,
-          data: "Could not delete with id " + req.params.userId
+          data: "Could not delete with id " + req.params.transferId
         });
       }
     } else res.send(data);
@@ -135,7 +116,7 @@ exports.delete = (req, res) => {
 
 // Delete all Customers from the database.
 exports.deleteAll = (req, res) => {
-  User.removeAll((err, data) => {
+  Transfer.removeAll((err, data) => {
     if (err)
       res.status(500).send({
         status: 500,

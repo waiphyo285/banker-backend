@@ -51,7 +51,6 @@ Account.getAll = result => {
       return;
     }
 
-    console.log("object: ", res);
     result(null, { status: 200, message: "Successfully retrived", data: res});
   });
 };

@@ -1,7 +1,14 @@
 module.exports = app => {
   const users = require("../controllers/user.controller.js");
+  const userroles = require("../controllers/userrole.controller.js");
   const customers = require("../controllers/customer.controller.js");
   const accounts = require("../controllers/account.controller.js");
+  const transfers = require("../controllers/transfer.controller.js");
+
+  app.get("/roles/all", userroles.all);
+  app.get("/roles/user", userroles.user, users.findAll);
+  app.get("/roles/customer", userroles.customer, customers.findAll);
+  app.get("/roles/history", userroles.history, transfers.findAll);
 
     // Create a new User
   app.post("/users/create", users.create);
@@ -43,4 +50,17 @@ module.exports = app => {
   app.delete("/accounts/:accountId", accounts.delete);
   // Remove all Accounts
   app.delete("/accounts/rmall", accounts.deleteAll);
+
+    // Create a new Transfer
+  app.post("/transfers/create", transfers.create);
+  // Retrieve all Transfer
+  app.get("/transfers/rtall", transfers.findAll);
+  // Retrieve a single Transfer with transferId
+  app.get("/transfers/:accountId", transfers.findOne);
+  // Update a Transfer with transferId
+  app.put("/transfers/:accountId", transfers.update);
+  // Delete a Transfer with transferId
+  app.delete("/transfers/:accountId", transfers.delete);
+  // Remove all Transfer
+  app.delete("/transfers/rmall", transfers.deleteAll);
 };

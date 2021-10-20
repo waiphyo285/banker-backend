@@ -23,7 +23,7 @@ Customer.create = (newCustomer, result) => {
 };
 
 Customer.findById = (customerId, result) => {
-  sql.query(`SELECT * FROM bank_customers WHERE id = '${customerId}'`, (err, res) => {
+  sql.query(`SELECT bank_customers.*, bank_accounts.account_number FROM bank_customers LEFT JOIN bank_accounts ON bank_customers.id = bank_accounts.customer_id  WHERE bank_customers.id = '${customerId}'`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -42,14 +42,13 @@ Customer.findById = (customerId, result) => {
 };
 
 Customer.getAll = result => {
-  sql.query("SELECT * FROM bank_customers", (err, res) => {
+  sql.query("SELECT bank_customers.*, bank_accounts.id as account_id,bank_accounts.account_number, bank_accounts.account_type, bank_accounts.deposit_amount FROM bank_customers LEFT JOIN bank_accounts ON bank_customers.id = bank_accounts.customer_id", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
       return;
     }
 
-    console.log("object: ", res);
     result(null, { status: 200, message: "Successfully retrived", data: res});
   });
 };
