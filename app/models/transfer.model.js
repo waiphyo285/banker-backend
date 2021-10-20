@@ -93,7 +93,8 @@ Transfer.getAll = result => {
   sql.query(`SELECT t.*, t1.account_number as  transfer_acc, t2.account_number as receive_acc
             FROM bank_transfers t
             JOIN bank_accounts t1 ON t1.id = t.transfer_acc_id
-            JOIN bank_accounts t2 ON t2.id = t.receive_acc_id`, (err, res) => {
+            JOIN bank_accounts t2 ON t2.id = t.receive_acc_id
+            ORDER BY updated_at DESC`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
