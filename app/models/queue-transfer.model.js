@@ -1,4 +1,4 @@
-const sql =  require("./database/connection.js");
+// const sql =  require("./database/connection.js");
 // const sql2 =  require("./database/connection2.js");
 
 const mysql = require('mysql2/promise');
@@ -21,8 +21,6 @@ QueueTransfer.create = async () => {
   await sql2.beginTransaction();
     
   const NormalTransfers = await sql2.execute('SELECT * FROM bank_transfers WHERE transfer_type = ? AND transfer_complete = ?', ['normal', 0]);
-
-    console.log(NormalTransfers[0]);
     
     if (NormalTransfers[0] && NormalTransfers[0].length > 0) {
         NormalTransfers[0].map(async (transObj, idx) => {
@@ -44,14 +42,14 @@ QueueTransfer.create = async () => {
                     );
 
                     console.log("Successfully transferred");
-                    
                 }
                 else {
                     console.log("Not enough to transfer money");
                 }  
 
-             } catch (err) {
-                console.log("Batch update  err", err);
+            } catch (err) {
+                console.log("Batch update err", err);
+                sql2.rollback();
             }
                     
         });

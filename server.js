@@ -6,6 +6,10 @@ const schedule = require('node-schedule');
 const bodyParser = require("body-parser");
 const Transfer = require("./app/models/transfer.model");
 const QueueTransfer = require("./app/models/queue-transfer.model");
+const { tokenRouter } = require("./app/middleware/generator");
+const apiRouter = require("./app/routes/web.routes");
+const apiUser = require("./app/routes/web.user");
+const _jwt = require("./app/middleware/jwt");
 
 let interval;
 const app = express();
@@ -28,7 +32,10 @@ app.use(function(req, res, next) {
 // simple route
 app.get("/", (req, res) => { res.json({ message: "Welcome to banker application." }); });
 
+require("./app/routes/web.user.js")(app);
 require("./app/routes/web.routes.js")(app);
+
+app.use('/d-mar', tokenRouter);
 
 // // set port, listen for requests
 const PORT = process.env.PORT || 7070;
@@ -70,14 +77,13 @@ const getApiAndEmit = socket => {
   
 };
 
-const job = schedule.scheduleJob('0 0 * * *', function () {
+const job = schedule.scheduleJob('0 15 0 * * *', function () {
   QueueTransfer.create((err, data) => {
     if (err)
       console.log(err)
     else  console.log(data);
   });
-  console.log("Batch transfer at every midnight.");
+  console.log("Batch transfer will run everyday at 12:15 AM.");
 });
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-

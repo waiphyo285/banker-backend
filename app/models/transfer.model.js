@@ -23,6 +23,8 @@ Transfer.create = async (newTransfer, result) => {
     password: dbConfig.PASSWORD,
     database: dbConfig.DB
   });
+
+  let transfer_complete = 0, transfer_charge = 0, batch_amount = 0;
   
   await sql2.execute('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
   await sql2.beginTransaction();
@@ -32,13 +34,23 @@ Transfer.create = async (newTransfer, result) => {
       'SELECT * FROM bank_accounts WHERE id = ?', [newTransfer.transfer_acc_id]
     )
 
-    if (checkBalance[0][0].deposit_amount >= newTransfer.transfer_amount) {
+    const batchBalance = await sql2.execute(
+      'SELECT SUM(transfer_amount) as total_batch FROM bank_transfers WHERE transfer_complete = ? AND transfer_acc_id = ? GROUP BY transfer_acc_id', [0, newTransfer.transfer_acc_id]
+    );
 
-      const transfer_complete = (newTransfer.transfer_type === "fast") ? 1 : 0;
+    batch_amount = (batchBalance[0][0]) ? parseInt(batchBalance[0][0].total_batch) : 0;
+
+    if (parseInt(checkBalance[0][0].deposit_amount) >= (parseInt(newTransfer.transfer_amount) + batch_amount)) {
+
+      if (newTransfer.transfer_type === "fast") {
+        transfer_complete = 1;
+        transfer_charge = newTransfer.transfer_amount * 5 / 100;
+        newTransfer.transfer_amount = newTransfer.transfer_amount - transfer_charge;
+      }
 
       await sql2.execute(
-        'INSERT INTO bank_transfers (id, transfer_acc_id, receive_acc_id, transfer_type, transfer_amount, transfer_complete, remark) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [newTransfer.id, newTransfer.transfer_acc_id, newTransfer.receive_acc_id, newTransfer.transfer_type, newTransfer.transfer_amount, transfer_complete, newTransfer.remark]
+        'INSERT INTO bank_transfers (id, transfer_acc_id, receive_acc_id, transfer_type, transfer_amount, transfer_charge, transfer_complete, remark) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [newTransfer.id, newTransfer.transfer_acc_id, newTransfer.receive_acc_id, newTransfer.transfer_type, newTransfer.transfer_amount, transfer_charge, transfer_complete, newTransfer.remark]
       )
 
       if (transfer_complete) {
@@ -52,16 +64,16 @@ Transfer.create = async (newTransfer, result) => {
           [newTransfer.receive_acc_id]
         );
       }
+      console.log("completed: ", newTransfer);
+    
+      result(null, { status: 200, message: "Successfully transferred", data: { ...newTransfer }});
     }
     else {
-      result({ message: "Not enough to transfer money"}, null);
+      console.log("incompleted: Not enough to transfer money");
+      result({ message: "Not enough to transfer money" }, null);
     }
 
     await sql2.commit();
-    
-    console.log("completed: ", newTransfer);
-    
-    result(null, { status: 200, message: "Successfully transferred", data: { ...newTransfer }});
   }
   catch (err) {
     console.log("error: ", err);

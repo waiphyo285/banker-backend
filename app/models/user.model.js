@@ -1,4 +1,5 @@
 const sql = require("./database/connection.js");
+const { Handlers } = require('../middleware/generator');
 const md5 = require('md5');
 
 // constructor
@@ -53,7 +54,11 @@ User.logIn = (username, password, result) => {
       console.log("found: ", res[0]);
 
      (res[0].password == md5(password))
-        ? result(null, { status: 200, message: "Successfully login", data: res[0] })
+       ? result(null, {
+         status: 200, message: "Successfully login", data: {
+           token: Handlers.generateTokenSign('waiphyo'), ...res[0]
+         }
+       })
         : result(null, { status: 401, message: "Unsuccessful login", data: {} })
       return;
     }
