@@ -46,7 +46,7 @@ const PORT = process.env.PORT || 7070;
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "http://localhost:7700",
+        origin: "http://50.17.29.48:7700",
     }
 });
 
