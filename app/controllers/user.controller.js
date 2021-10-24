@@ -3,6 +3,8 @@ const User = require("../models/user.model.js");
 
 // Create and Save a new User
 exports.create = (req, res, next) => {
+  console.log(req.body);
+
   // Validate request
   if (!req.body) {
     res.status(400).send({
@@ -15,7 +17,9 @@ exports.create = (req, res, next) => {
   const user = new User({
     id: req.body.id || uuidv4(),
     username: req.body.username,
-    password: req.body.password
+    password: req.body.password,
+    created_at: `${req.body.created_at}`,
+    updated_at: `${req.body.updated_at}`
   });
 
   // Save User in the database

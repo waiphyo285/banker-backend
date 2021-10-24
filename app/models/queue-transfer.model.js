@@ -33,11 +33,11 @@ QueueTransfer.create = async () => {
                         [transObj.id]
                     );
 
-                    await sql2.execute(`UPDATE bank_accounts SET deposit_amount=deposit_amount - ${transObj.transfer_amount} WHERE id = ?`,
+                    await sql2.execute(`UPDATE bank_accounts SET deposit_amount=deposit_amount - ${transObj.transfer_amount}, updated_at = '${moment(new Date()).format("YYYY-MM-DD HH:mm:ss")}' WHERE id = ?`,
                         [transObj.transfer_acc_id]
                     );
                 
-                    await sql2.execute(`UPDATE bank_accounts SET deposit_amount=deposit_amount + ${transObj.transfer_amount} WHERE id = ?`,
+                    await sql2.execute(`UPDATE bank_accounts SET deposit_amount=deposit_amount + ${transObj.transfer_amount}, updated_at = '${moment(new Date()).format("YYYY-MM-DD HH:mm:ss")}' WHERE id = ?`,
                         [transObj.receive_acc_id]
                     );
 

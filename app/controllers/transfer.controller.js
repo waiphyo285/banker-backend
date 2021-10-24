@@ -18,7 +18,9 @@ exports.create = (req, res, next) => {
     receive_acc_id: req.body.receive_acc_id,
     transfer_amount: req.body.transfer_amount,
     transfer_type: req.body.transfer_type,
-    remark: req.body.remark
+    remark: req.body.remark,
+    created_at: `${req.body.created_at}`,
+    updated_at: `${req.body.updated_at}`
   });
 
   // Save Transfer in the database

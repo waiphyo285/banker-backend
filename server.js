@@ -4,6 +4,7 @@ const http = require("http");
 const socketIo = require("socket.io");
 const schedule = require('node-schedule');
 const bodyParser = require("body-parser");
+const moment = require("moment");
 const Transfer = require("./app/models/transfer.model");
 const QueueTransfer = require("./app/models/queue-transfer.model");
 const { tokenRouter } = require("./app/middleware/generator");
@@ -21,6 +22,13 @@ app.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(function (req, res, next) {
+    req.body.created_at = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+    req.body.updated_at = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+  
+    next();
+});
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -46,7 +54,7 @@ const PORT = process.env.PORT || 7070;
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "http://50.17.29.48:7700",
+        origin: "http://localhost:7700",
     }
 });
 

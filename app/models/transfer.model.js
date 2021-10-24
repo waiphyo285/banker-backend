@@ -8,12 +8,14 @@ const md5 = require('md5');
 
 // constructor
 const Transfer = function(transfer) {
-    this.id = transfer.id,
-    this.transfer_acc_id = transfer.transfer_acc_id,
-    this.receive_acc_id = transfer.receive_acc_id,
-    this.transfer_amount = transfer.transfer_amount,
-    this.transfer_type = transfer.transfer_type,
-    this.remark = transfer.remark
+  this.id = transfer.id;
+  this.transfer_acc_id = transfer.transfer_acc_id;
+  this.receive_acc_id = transfer.receive_acc_id;
+  this.transfer_amount = transfer.transfer_amount;
+  this.transfer_type = transfer.transfer_type;
+  this.remark = transfer.remark;
+  this.created_at = transfer.created_at;
+  this.updated_at = transfer.updated_at;
 };
 
 Transfer.create = async (newTransfer, result) => {
@@ -49,18 +51,18 @@ Transfer.create = async (newTransfer, result) => {
       }
 
       await sql2.execute(
-        'INSERT INTO bank_transfers (id, transfer_acc_id, receive_acc_id, transfer_type, transfer_amount, transfer_charge, transfer_complete, remark) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [newTransfer.id, newTransfer.transfer_acc_id, newTransfer.receive_acc_id, newTransfer.transfer_type, newTransfer.transfer_amount, transfer_charge, transfer_complete, newTransfer.remark]
+        'INSERT INTO bank_transfers (id, transfer_acc_id, receive_acc_id, transfer_type, transfer_amount, transfer_charge, transfer_complete, remark, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [newTransfer.id, newTransfer.transfer_acc_id, newTransfer.receive_acc_id, newTransfer.transfer_type, newTransfer.transfer_amount, transfer_charge, transfer_complete, newTransfer.remark, `${newTransfer.created_at}`, `${newTransfer.updated_at}`]
       )
 
       if (transfer_complete) {
         await sql2.execute(
-          `UPDATE bank_accounts SET deposit_amount=deposit_amount - ${newTransfer.transfer_amount} WHERE id = ?`,
+          `UPDATE bank_accounts SET deposit_amount=deposit_amount - ${newTransfer.transfer_amount}, updated_at = '${newTransfer.updated_at}' WHERE id = ?`,
           [newTransfer.transfer_acc_id]
         );
     
         await sql2.execute(
-          `UPDATE bank_accounts SET deposit_amount=deposit_amount + ${newTransfer.transfer_amount} WHERE id = ?`,
+          `UPDATE bank_accounts SET deposit_amount=deposit_amount + ${newTransfer.transfer_amount}, updated_at = '${newTransfer.updated_at}' WHERE id = ?`,
           [newTransfer.receive_acc_id]
         );
       }
@@ -120,7 +122,7 @@ Transfer.getAll = result => {
 Transfer.updateById = (id, transfer, result) => {
 
   sql.query(
-    "UPDATE bank_transfers SET transfer_acc_id = ?, receive_acc_id = ?, transfer_amount = ?, transfer_type =  ?, remark = ? WHERE id = ?", [transfer.transfer_acc_id, transfer.receive_acc_id, transfer.transfer_amount, transfer.transfer_type, transfer.remark, id],
+    "UPDATE bank_transfers SET transfer_acc_id = ?, receive_acc_id = ?, transfer_amount = ?, transfer_type =  ?, remark = ?, updated_at WHERE id = ?", [transfer.transfer_acc_id, transfer.receive_acc_id, transfer.transfer_amount, transfer.transfer_type, transfer.remark, transfer.updated_at, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);

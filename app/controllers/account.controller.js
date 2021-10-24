@@ -18,7 +18,9 @@ exports.create = (req, res) => {
     customer_id: req.body.customer_id,
     account_type: req.body.account_type || "current",
     account_number: req.body.account_number || cardGen({ starts_with: '171301' }),
-    deposit_amount: req.body.deposit_amount || 100
+    deposit_amount: req.body.deposit_amount || 100,
+    created_at: `${req.body.created_at}`,
+    updated_at: `${req.body.updated_at}`,
   });
 
   // Save Account in the database

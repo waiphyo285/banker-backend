@@ -6,6 +6,8 @@ const Customer = function(customer) {
   this.id = customer.id;
   this.username = customer.username;
   this.password = md5(customer.password);
+  this.created_at = customer.created_at;
+  this.updated_at = customer.updated_at;
 };
 
 Customer.create = (newCustomer, result) => {
@@ -56,7 +58,7 @@ Customer.getAll = result => {
 Customer.updateById = (id, customer, result) => {
 
   sql.query(
-    "UPDATE bank_customers SET username = ?, password = ?, status = ?, remark = ? WHERE id = ?", [customer.username, customer.password, customer.status, customer.remark, id],
+    "UPDATE bank_customers SET username = ?, password = ?, status = ?, remark = ?, updated_at = ? WHERE id = ?", [customer.username, customer.password, customer.status, customer.remark, `${customer.updated_at}`, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);

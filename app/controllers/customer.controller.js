@@ -15,7 +15,9 @@ exports.create = (req, res, next) => {
   const customer = new Customer({
     id: req.body.id || uuidv4(),
     username: req.body.username,
-    password: req.body.password
+    password: req.body.password,
+    created_at: `${req.body.created_at}`,
+    updated_at: `${req.body.updated_at}`
   });
 
   // Save Customer in the database

@@ -7,6 +7,8 @@ const Account = function(account) {
   this.account_type = account.account_type;
   this.account_number = account.account_number;
   this.deposit_amount = account.deposit_amount;
+  this.created_at = account.created_at;
+  this.updated_at = account.updated_at;
 };
 
 
@@ -58,7 +60,7 @@ Account.getAll = result => {
 Account.updateById = (id, account, result) => {
 
   sql.query(
-    "UPDATE bank_accounts SET username = ?, password = ?, status = ?, remark = ? WHERE id = ?", [account.username, account.password, account.status, account.remark, id],
+    "UPDATE bank_accounts SET username = ?, password = ?, status = ?, remark = ?, updated_at = ? WHERE id = ?", [account.username, account.password, account.status, account.remark, `${account.updated_at}`, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);
